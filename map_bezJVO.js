@@ -1,8 +1,8 @@
 function initializeMapBezJVO() {
     // Inicializace mapy
     const map_bezJVO = L.map('map_bezJVO', {
-        minZoom: 12,   // Minimální úroveň zoomu
-        maxZoom: 15    // Maximální úroveň zoomu
+        minZoom: 12,
+        maxZoom: 15
     });
 
     // Definice základních vrstev
@@ -31,7 +31,7 @@ function initializeMapBezJVO() {
 
     // Načtení GeoJSON dat
     const geojsonPath = 'silnice_bezJVO.json';
-    let currentlyHighlighted = null;  // Bude uchovávat aktuálně zvýrazněný úsek
+    let currentlyHighlighted = null;
 
     fetch(geojsonPath)
         .then(response => response.json())
@@ -45,13 +45,13 @@ function initializeMapBezJVO() {
                 style: function (feature) {
                     return {
                         color: getColor(feature.properties.vytizeni),
-                        weight: getWeight(feature.properties.vytizeni),  // Dynamická tloušťka čáry
+                        weight: getWeight(feature.properties.vytizeni),
                         opacity: 0.8
                     };
                 },
                 onEachFeature: function (feature, layer) {
                     // Přidání vyskakovacího okna s hodnotou 'vytizeni'
-                    layer.bindPopup("Vytíženost: " + feature.properties.vytizeni + " vozidel");
+                    layer.bindPopup("Vytíženost: " + feature.properties.vytizeni + " vozidel za den");
 
                     // Nastavení zvýraznění při kliknutí
                     layer.on('click', function () {
@@ -67,18 +67,18 @@ function initializeMapBezJVO() {
                         // Nastavení nového zvýraznění
                         currentlyHighlighted = layer;
                         layer.setStyle({
-                            color: 'yellow',  // Barva pro zvýraznění
-                            weight: 8,        // Tloušťka čáry pro zvýraznění
-                            opacity: 1        // Plná opacita
+                            color: 'yellow',
+                            weight: 8,
+                            opacity: 1
                         });
-                        // Po 1 vteřině vrátí zvýrazněný úsek zpět na původní barvu
+                        // Po 2 vteřinách se vrátí zvýrazněný úsek zpět na původní barvu
                         setTimeout(function () {
                             currentlyHighlighted.setStyle({
                                 color: getColor(currentlyHighlighted.feature.properties.vytizeni),
                                 weight: getWeight(currentlyHighlighted.feature.properties.vytizeni),
                                 opacity: 0.8
                             });
-                        }, 3000);
+                        }, 2000);
 
                     });
                 }
@@ -88,7 +88,7 @@ function initializeMapBezJVO() {
             geojsonLayer.addTo(map_bezJVO);
 
             const bounds = geojsonLayer.getBounds();
-            map_bezJVO.fitBounds(bounds, { padding: [-100, -100] });  // Přidání okrajů (padding) pro přiblížení
+            map_bezJVO.fitBounds(bounds, { padding: [-100, -100] });
 
             // Definice přepínače vrstev až po načtení geojsonLayer
             const baseLayers = {
@@ -110,7 +110,7 @@ function initializeMapBezJVO() {
 
     // Funkce pro přiřazení barvy
     function getColor(vytizeni) {
-        vytizeni = parseFloat(vytizeni); // Ujistěte se, že vytizeni je číslo
+        vytizeni = parseFloat(vytizeni);
         return vytizeni > 18000 ? 'rgb(100, 0, 0)' :
             vytizeni > 14001 ? 'rgb(140, 0, 0)' :
                 vytizeni > 10001 ? 'rgb(180, 0, 0)' :
@@ -123,7 +123,7 @@ function initializeMapBezJVO() {
 
     // Funkce pro přiřazení tloušťky čáry podle vytíženosti
     function getWeight(vytizeni) {
-        vytizeni = parseFloat(vytizeni); // Ujistěte se, že vytizeni je číslo
+        vytizeni = parseFloat(vytizeni);
         return vytizeni > 18000 ? 6 :
             vytizeni > 14001 ? 5.5 :
                 vytizeni > 10001 ? 5 :
@@ -134,6 +134,5 @@ function initializeMapBezJVO() {
                                     2;
     }
 
-    return map_bezJVO; // Vrátí instanci mapy
+    return map_bezJVO;
 }
-

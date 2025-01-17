@@ -1,8 +1,8 @@
 function initializeMapSJVO() {
     // Inicializace mapy
     const map_sJVO = L.map('map_sJVO', {
-        minZoom: 12,   // Minimální úroveň zoomu
-        maxZoom: 15    // Maximální úroveň zoomu
+        minZoom: 12,
+        maxZoom: 15
     });
 
     // Definice základních vrstev
@@ -31,7 +31,7 @@ function initializeMapSJVO() {
 
     // Načtení GeoJSON dat
     const geojsonPath = 'silnice_sJVO.json';
-    let currentlyHighlighted = null;  // Bude uchovávat aktuálně zvýrazněný úsek
+    let currentlyHighlighted = null;
     fetch(geojsonPath)
         .then(response => response.json())
         .then(data => {
@@ -44,13 +44,13 @@ function initializeMapSJVO() {
                 style: function (feature) {
                     return {
                         color: getColor(feature.properties.vytizeni),
-                        weight: getWeight(feature.properties.vytizeni),  // Dynamická tloušťka čáry
+                        weight: getWeight(feature.properties.vytizeni),
                         opacity: 0.8
                     };
                 },
                 onEachFeature: function (feature, layer) {
                     // Přidání vyskakovacího okna s hodnotou 'vytizeni'
-                    layer.bindPopup("Vytíženost: " + feature.properties.vytizeni + " vozidel");
+                    layer.bindPopup("Vytíženost: " + feature.properties.vytizeni + " vozidel za den");
 
                     // Nastavení zvýraznění při kliknutí
                     layer.on('click', function () {
@@ -66,19 +66,19 @@ function initializeMapSJVO() {
                         // Nastavení nového zvýraznění
                         currentlyHighlighted = layer;
                         layer.setStyle({
-                            color: 'yellow',  // Barva pro zvýraznění
-                            weight: 8,        // Tloušťka čáry pro zvýraznění
-                            opacity: 1        // Plná opacita
+                            color: 'yellow',
+                            weight: 8,
+                            opacity: 1
                         });
 
-                        // Po 1 vteřině vrátí zvýrazněný úsek zpět na původní barvu
+                        // Po 2 vteřinách vrátí zvýrazněný úsek zpět na původní barvu
                         setTimeout(function () {
                             currentlyHighlighted.setStyle({
                                 color: getColor(currentlyHighlighted.feature.properties.vytizeni),
                                 weight: getWeight(currentlyHighlighted.feature.properties.vytizeni),
                                 opacity: 0.8
                             });
-                        }, 3000);
+                        }, 2000);
                     });
                 }
             });
@@ -87,7 +87,7 @@ function initializeMapSJVO() {
             geojsonLayer.addTo(map_sJVO);
 
             const bounds = geojsonLayer.getBounds();
-            map_sJVO.fitBounds(bounds, { padding: [-100, -100] });  // Přidání okrajů (padding) pro přiblížení
+            map_sJVO.fitBounds(bounds, { padding: [-100, -100] });
 
             // Definice přepínače vrstev až po načtení geojsonLayer
             const baseLayers = {
@@ -118,16 +118,16 @@ function initializeMapSJVO() {
     // Přidání všech popisků na mapu
     tooltipsData.forEach(item => {
         L.tooltip({
-            permanent: true,      // Popisky budou stále viditelné
-            direction: 'center',  // Zarovnání na střed
-            className: 'static-label' // Stylová třída pro úpravu vzhledu
+            permanent: true,
+            direction: 'center',
+            className: 'static-label'
         })
-            .setLatLng([item.lat, item.lng])  // Nastavení souřadnic
-            .setContent(item.text)           // Nastavení textu popisku
-            .addTo(map_sJVO);              // Přidání do mapy
+            .setLatLng([item.lat, item.lng])
+            .setContent(item.text)
+            .addTo(map_sJVO);
     });
 
-    // Funkce pro přiřazení barvy
+    // Funkce pro přiřazení barvy linie podle vytíženosti
     function getColor(vytizeni) {
         vytizeni = parseFloat(vytizeni); // Ujistěte se, že vytizeni je číslo
         return vytizeni > 18000 ? 'rgb(100, 0, 0)' :
@@ -140,9 +140,9 @@ function initializeMapSJVO() {
                                     'rgb(255, 190, 190)';
     }
 
-    // Funkce pro přiřazení tloušťky čáry podle vytíženosti
+    // Funkce pro přiřazení tloušťky linie podle vytíženosti
     function getWeight(vytizeni) {
-        vytizeni = parseFloat(vytizeni); // Ujistěte se, že vytizeni je číslo
+        vytizeni = parseFloat(vytizeni);
         return vytizeni > 18000 ? 6 :
             vytizeni > 14001 ? 5.5 :
                 vytizeni > 10001 ? 5 :
